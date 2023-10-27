@@ -7,7 +7,6 @@ const connection = (url) => {
         .connect(url)
         .then(() => console.log(`Mongo Connected`))
         .catch(error => console.log(error));
-
 }
 
 export default connection;
