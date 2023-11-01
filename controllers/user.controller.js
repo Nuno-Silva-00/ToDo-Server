@@ -1,42 +1,53 @@
-import USER from "../mongo/models/user.js";
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
-//falta tokens 
+import USER from "../mongo/models/user.js";
+
+
 const createUser = async (req, res) => {
     try {
         const { name, email, password } = req.body;
-
-        const userExists = await USER.findOne({ email });
-
-        if (userExists)
-            return res.status(200).json({ message: 'Email already Exists' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = await USER.create({ name, email, password: hashedPassword });
 
-        res.status(200).json({ id: newUser.id, name: newUser.name, allToDos: newUser.allToDos });
+        const token = jwt.sign({ id: newUser.id },
+            process.env.ACCESS_TOKEN_SECRET,
+            {
+                algorithm: 'HS256',
+                allowInsecureKeySizes: true,
+                expiresIn: 86400, // 24 hours
+            });
+
+        res.status(200).json({ accessToken: token });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
-//falta token
+
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
         const userExists = await USER.findOne({ email });
 
-        if (!userExists)
-            return res.status(400).json({ message: 'Email not Found!' });
+        if (!userExists) return res.status(400).json({ message: 'Email not Found!' });
 
         const passwordMatch = await bcrypt.compare(password, userExists.password);
 
-        if (passwordMatch)
-            return res.status(200).json({ id: userExists.id, name: userExists.name, allToDos: userExists.allToDos });
-        else
-            return res.status(400).json({ message: 'Wrong Password!' });
+        if (!passwordMatch) return res.status(400).json({ message: 'Wrong Password!' });
 
+        const token = jwt.sign({ id: userExists.id },
+            process.env.ACCESS_TOKEN_SECRET,
+            {
+                algorithm: 'HS256',
+                allowInsecureKeySizes: true,
+                expiresIn: 86400, // 24 hours
+            });
+
+        return res.status(200).json({ accessToken: token });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ message: error.message });
     }
 };

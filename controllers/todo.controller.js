@@ -1,19 +1,21 @@
 import USER from "../mongo/models/user.js";
 import TODO from "../mongo/models/todo.js";
-//still need to add tokens
+
 const createToDo = async (req, res) => {
+    const { todo } = req.body;
+    const userId = req.userId;
+
     try {
-        const { id, todo } = req.body;
-        const user = await USER.findById(id);
+        const user = await USER.findById(userId);
         if (!user) throw new Error("User not Found!");
 
         const newToDo = await TODO.create({
             todo,
             createdAt: new Date().toISOString(),
-            creator: id
+            creator: userId
         });
 
-        await USER.findOneAndUpdate({ _id: id }, { $push: { allToDos: newToDo._id } })
+        await USER.findOneAndUpdate({ _id: userId }, { $push: { allToDos: newToDo._id } })
         res.status(200).json({ newToDo });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -21,13 +23,13 @@ const createToDo = async (req, res) => {
 };
 
 const getToDo = async (req, res) => {
-
+    const userId = req.userId;
 }
 const updateToDo = async (req, res) => {
-
+    const userId = req.userId;
 }
 const deleteToDo = async (req, res) => {
-
+    const userId = req.userId;
 }
 
 
