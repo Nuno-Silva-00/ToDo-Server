@@ -20,7 +20,7 @@ const createUser = async (req, res) => {
                 expiresIn: 86400, // 24 hours
             });
 
-        res.status(200).json({ accessToken: token });
+        res.status(200).json({ accessToken: token, expiresIn: 86400 });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -31,11 +31,11 @@ const loginUser = async (req, res) => {
         const { email, password } = req.body;
         const userExists = await USER.findOne({ email });
 
-        if (!userExists) return res.status(400).json({ message: 'Email not Found!' });
+        if (!userExists) return res.status(400).json({ message: 'EMAIL_NOT_FOUND' });
 
         const passwordMatch = await bcrypt.compare(password, userExists.password);
 
-        if (!passwordMatch) return res.status(400).json({ message: 'Wrong Password!' });
+        if (!passwordMatch) return res.status(400).json({ message: 'WRONG_PASSWORD' });
 
         const token = jwt.sign({ id: userExists.id },
             process.env.ACCESS_TOKEN_SECRET,
@@ -45,7 +45,7 @@ const loginUser = async (req, res) => {
                 expiresIn: 86400, // 24 hours
             });
 
-        return res.status(200).json({ accessToken: token });
+        return res.status(200).json({ accessToken: token, expiresIn: 86400 });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: error.message });
