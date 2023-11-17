@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import USER from "../mongo/models/user.js";
 import TODO from "../mongo/models/todo.js";
 
@@ -24,7 +26,19 @@ const createToDo = async (req, res) => {
 
 const getToDo = async (req, res) => {
     const userId = req.userId;
+    const toDoList = [];
+
+    try {
+        const list = await TODO.find({ 'creator': userId });
+        list.forEach(toDo => {
+            toDoList.push({ id: toDo._id, toDo: toDo.todo });
+        });
+        res.status(200).json(toDoList);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 }
+
 const updateToDo = async (req, res) => {
     const userId = req.userId;
 }
