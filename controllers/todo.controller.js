@@ -18,7 +18,7 @@ const createToDo = async (req, res) => {
         });
 
         await USER.findOneAndUpdate({ _id: userId }, { $push: { allToDos: newToDo._id } })
-        res.status(200).json({ newToDo });
+        res.status(200).json({ id: newToDo.id, todo: newToDo.todo });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
