@@ -17,5 +17,5 @@ router.use(function (req, res, next) {
 router.route('/create').post(verifyToken, createToDo);
 router.route('/').get(verifyToken, getToDo);
 router.route('/update/:id').patch(verifyToken, updateToDo);
-router.route('/delete/"id').delete(verifyToken, deleteToDo)
+router.route('/delete/:id').delete(verifyToken, deleteToDo)
 export default router;

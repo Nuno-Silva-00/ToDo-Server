@@ -18,7 +18,7 @@ const createToDo = async (req, res) => {
         });
 
         await USER.findOneAndUpdate({ _id: userId }, { $push: { allToDos: newToDo._id } })
-        res.status(200).json({ id: newToDo.id, todo: newToDo.todo });
+        res.status(200).json({ id: newToDo.id, toDo: newToDo.todo });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -42,8 +42,17 @@ const getToDo = async (req, res) => {
 const updateToDo = async (req, res) => {
     const userId = req.userId;
 }
+
 const deleteToDo = async (req, res) => {
+    const IdToDelete = req.params.id;
     const userId = req.userId;
+
+    try {
+        await TODO.deleteOne({ 'creator': userId, '_id': IdToDelete });
+        res.status(200).json({ message: 'ToDo Deleted' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 }
 
 
