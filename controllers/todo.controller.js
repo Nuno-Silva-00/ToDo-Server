@@ -41,14 +41,25 @@ const getToDo = async (req, res) => {
 
 const updateToDo = async (req, res) => {
     const userId = req.userId;
+    const { id, toDo } = req.body;
+
+    try {
+        await TODO.findOneAndUpdate({ '_id': id, creator: userId }, { todo: toDo });
+        res.status(200).json({ message: 'ToDo Updated' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 }
 
 const deleteToDo = async (req, res) => {
-    const IdToDelete = req.params.id;
+    const idToDelete = req.params.id;
     const userId = req.userId;
 
     try {
-        await TODO.deleteOne({ 'creator': userId, '_id': IdToDelete });
+        await TODO.deleteOne({ 'creator': userId, '_id': idToDelete });
+        await USER.findByIdAndUpdate(userId, {
+            $pull: { allToDos: idToDelete }
+        })
         res.status(200).json({ message: 'ToDo Deleted' });
     } catch (error) {
         res.status(500).json({ message: error.message });
