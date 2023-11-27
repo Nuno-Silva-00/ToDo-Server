@@ -20,6 +20,8 @@ app.get('/', (req, res) => {
 
 app.use('/api/user', userRouter);
 app.use('/api/todo', todoRouter);
+app.use('/api/shopping', todoRouter);
+// app.use('/api/notes', todoRouter);
 
 
 const startServer = async () => {
