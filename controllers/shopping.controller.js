@@ -2,7 +2,7 @@ import USER from "../mongo/models/user.js";
 import SHOPPING from "../mongo/models/shopping.js";
 
 const createItem = async (req, res) => {
-    const { item, amount, unit } = req.body;
+    const { item, amount } = req.body;
     const userId = req.userId;
 
     try {
@@ -12,13 +12,12 @@ const createItem = async (req, res) => {
         const newItem = await SHOPPING.create({
             item,
             amount,
-            unit,
             createdAt: new Date().toISOString(),
             creator: userId
         });
 
         await USER.findOneAndUpdate({ _id: userId }, { $push: { allItems: newItem._id } })
-        res.status(200).json({ id: newItem.id, item: newItem.item });
+        res.status(200).json({ id: newItem.id, item: newItem.item, amount: newItem.amount });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -31,7 +30,7 @@ const getItems = async (req, res) => {
     try {
         const list = await SHOPPING.find({ 'creator': userId });
         list.forEach(item => {
-            itemList.push({ id: item._id, item: item.item });
+            itemList.push({ id: item._id, item: item.item, amount: item.amount });
         });
         res.status(200).json(itemList);
     } catch (error) {
@@ -41,10 +40,10 @@ const getItems = async (req, res) => {
 
 const updateItem = async (req, res) => {
     const userId = req.userId;
-    const { id, item, amount, unit } = req.body;
+    const { id, item, amount } = req.body;
 
     try {
-        await SHOPPING.findOneAndUpdate({ '_id': id, creator: userId }, { item, amount, unit });
+        await SHOPPING.findOneAndUpdate({ '_id': id, creator: userId }, { item, amount });
         res.status(200).json({ message: 'Shopping list item Updated!' });
     } catch (error) {
         res.status(500).json({ message: error.message });
