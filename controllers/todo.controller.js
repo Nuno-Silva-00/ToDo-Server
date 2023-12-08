@@ -26,14 +26,32 @@ const createToDo = async (req, res) => {
 
 const getToDo = async (req, res) => {
     const userId = req.userId;
-    const toDoList = [];
+    let toDoList = [];
+    let orderList = [];
+    let finalList = [];
 
     try {
         const list = await TODO.find({ 'creator': userId });
+
+        const user = await USER.findById(userId);
+
         list.forEach(toDo => {
             toDoList.push({ id: toDo._id, toDo: toDo.todo });
         });
-        res.status(200).json(toDoList);
+
+        user.allToDos.forEach(id => {
+            orderList.push(id);
+        });
+
+        orderList.forEach(id => {
+            toDoList.forEach(toDo => {
+                if (id == toDo.id.toHexString()) {
+                    finalList.push(toDo);
+                }
+            });
+        });
+
+        res.status(200).json(finalList);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -66,6 +84,26 @@ const deleteToDo = async (req, res) => {
     }
 }
 
+const updateOrder = async (req, res) => {
+    const userId = req.userId;
+    const { newOrder } = req.body;
 
+    let updatedIds = []
 
-export { createToDo, getToDo, updateToDo, deleteToDo };
+    newOrder.map((item) =>
+        updatedIds.push(item.id)
+    );
+
+    try {
+        await USER.findByIdAndUpdate(userId,
+            {
+                allToDos: updatedIds
+            });
+        res.status(200).json({ message: 'Order Updated' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export { createToDo, getToDo, updateToDo, updateOrder, deleteToDo };

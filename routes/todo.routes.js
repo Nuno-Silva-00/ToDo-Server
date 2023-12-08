@@ -1,5 +1,5 @@
 import express from "express";
-import { createToDo, getToDo, updateToDo, deleteToDo } from '../controllers/todo.controller.js'
+import { createToDo, getToDo, updateToDo, updateOrder, deleteToDo, } from '../controllers/todo.controller.js'
 import { verifyToken } from "../middleware/auth.js";
 
 
@@ -17,5 +17,6 @@ router.use(function (req, res, next) {
 router.route('/create').post(verifyToken, createToDo);
 router.route('/').get(verifyToken, getToDo);
 router.route('/update').patch(verifyToken, updateToDo);
-router.route('/delete/:id').delete(verifyToken, deleteToDo)
+router.route('/updateOrder').patch(verifyToken, updateOrder);
+router.route('/delete/:id').delete(verifyToken, deleteToDo);
 export default router;
